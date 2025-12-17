@@ -2,7 +2,7 @@
  * @Author: 无序熵增
  * @Date: 2025-12-11 22:22:40
  * @LastEditors: 无序熵增
- * @LastEditTime: 2025-12-17 11:16:38
+ * @LastEditTime: 2025-12-17 11:20:54
  * @Description: 
  * 
  * Copyright (c) 2025 by 无序熵增, All Rights Reserved. 
@@ -47,6 +47,7 @@
 ### 编译步骤
 - 使用快捷键 **`Ctrl + Alt + S`** 进行编译，固件将导出至项目文件夹
 - 编译结果是一个 **`.uf2`** 格式的文件
+
 ![编译步骤](images/Compilation.png) <!-- 添加板子图片 -->
 ![固件](images/Compilation1.png) <!-- 添加板子图片 -->
 ## 烧录指南
