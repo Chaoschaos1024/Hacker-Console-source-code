@@ -2,7 +2,7 @@
  * @Author: 无序熵增
  * @Date: 2025-12-11 22:22:40
  * @LastEditors: 无序熵增
- * @LastEditTime: 2025-12-17 11:20:54
+ * @LastEditTime: 2025-12-17 11:23:46
  * @Description: 
  * 
  * Copyright (c) 2025 by 无序熵增, All Rights Reserved. 
@@ -43,6 +43,7 @@
 ### 编译设置
 1. **Boot Stage 2**：选择 **Generic SPI/4**
 2. **USB Stack**：设置为 **“PICO SDK”**
+
 ![编译设置](images/Compilation_Settings.png) <!-- 添加板子图片 -->
 ### 编译步骤
 - 使用快捷键 **`Ctrl + Alt + S`** 进行编译，固件将导出至项目文件夹
