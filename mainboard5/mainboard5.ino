@@ -23,7 +23,7 @@ IIC_TOUCH touch;
 IIC_DISPLAY iic_display;
 
 uint8_t loop_count = 0;
-#define loop_count_max 20
+#define loop_count_max 10
 
 unsigned int mouse_x = 0;
 unsigned int mouse_y = 0;
@@ -31,7 +31,7 @@ unsigned int mouse_y = 0;
 #if debug
 unsigned int delay_time = 0;
 long long int loop_count_debug = 0;
-  int allwaysdelay = 0;
+int allwaysdelay = 0;
 #endif
 void setup() {
   io.begin();
@@ -160,23 +160,18 @@ void loop() {
     erom.write_backlight_value(io.backlight_value);
     kb.need_increase_backlight = false;
   }
-  if (loop_count == 5) {
-    kb.need_increase_backlight = false;
-    kb.need_reduce_backlight = false;
-    kb.need_increase_fan_speed = false;
-    kb.need_reduce_fan_speed = false;
-  } else if (loop_count == 6) {
+  if (loop_count == 1) {
     io.battery_voltage_update();
-  } else if (loop_count == 7) {
+  } else if (loop_count == 2) {
     io.update_charge_status();
-  } else if (loop_count == 8) {
+  } else if (loop_count == 3) {
     io.read_hdmi_status();
-  } else if (loop_count == 9) {
-    ws.calculate(io.battery_percent, 0, kb.last_key, touch.is_touched, kb.capslock, erom.fan_pwm_value, erom.backlight_pwm_value);
-  } else if (loop_count == 10) {
-    ws.update();
-  } else if (loop_count == 13) {
+  } else if (loop_count == 6) {
     if (touch.is_touched) {
+  } else if (loop_count == 4) {
+    ws.calculate(io.battery_percent, 0, kb.last_key, touch.is_touched, kb.capslock, erom.fan_pwm_value, erom.backlight_pwm_value);
+  } else if (loop_count == 5) {
+    ws.update();
       touch.is_touched--;
       iic_display.update(mouse_x, mouse_y, io.charge_or_not, io.charge_done_or_not, io.battery_percent, io.battery_voltage, io.screen_enabled, io.backlight_value, io.fan_speed_value, kb.keyboard_connect, kb.last_key);
     } else if (kb.mouse_moved) {
@@ -185,7 +180,7 @@ void loop() {
     } else {
       iic_display.update(0, 0, io.charge_or_not, io.charge_done_or_not, io.battery_percent, io.battery_voltage, io.screen_enabled, io.backlight_value, io.fan_speed_value, kb.keyboard_connect, kb.last_key);
     }
-  } else if (loop_count == 17) {
+  } else if (loop_count == 7) {
     iic_display.flash();
   }
   loop_count++;

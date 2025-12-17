@@ -81,7 +81,7 @@ bool IIC_DISPLAY::screen_exist_test()
   }
   return false;
 }
-bool IIC_DISPLAY::update(unsigned int x, unsigned int y, bool charge_or_not, bool charge_done_or_not, unsigned int battery_percent, unsigned int battery_voltage, bool screen_enabled, float backlight_duty_cycle, unsigned int fan_duty_cycle, unsigned int keyboard_status, unsigned int last_key)
+bool IIC_DISPLAY::update(unsigned int x, unsigned int y, bool charge_or_not, bool charge_done_or_not, unsigned int battery_percent, unsigned int battery_voltage, bool screen_enabled, uint8_t backlight_duty_cycle, uint8_t fan_duty_cycle, unsigned int keyboard_status, unsigned int last_key)
 {
   if (ssd1306_screen_exist)
   {
@@ -214,7 +214,7 @@ bool IIC_DISPLAY::update(unsigned int x, unsigned int y, bool charge_or_not, boo
 #else
     display.print("Light:");
 #endif
-    float i = backlight_duty_cycle;
+    uint8_t i = backlight_duty_cycle;
 #if debug
     display.print(i);
     display.print("/");

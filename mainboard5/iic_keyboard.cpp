@@ -259,7 +259,7 @@ bool IIC_KEYBOARD::old_keyboard_routine(int mouse_x, int mouse_y)
     Serial1.println("special instruction");
 #endif
     // if changed, set flag AND update old matrix so we don't keep retriggering
-    if (keyboard_matrix[6][0] != old_keyboard_matrix_last_time[6][0])
+    if (keyboard_matrix[6][0])
     {
       need_increase_backlight = true;
       old_keyboard_matrix_last_time[6][0] = keyboard_matrix[6][0];
@@ -267,7 +267,7 @@ bool IIC_KEYBOARD::old_keyboard_routine(int mouse_x, int mouse_y)
       Serial1.println("need increase backlight");
 #endif
     }
-    if (keyboard_matrix[5][0] != old_keyboard_matrix_last_time[5][0])
+    if (keyboard_matrix[5][0] )
     {
       need_reduce_backlight = true;
       old_keyboard_matrix_last_time[5][0] = keyboard_matrix[5][0];
@@ -275,7 +275,7 @@ bool IIC_KEYBOARD::old_keyboard_routine(int mouse_x, int mouse_y)
       Serial1.println("need reduce backlight");
 #endif
     }
-    if (keyboard_matrix[4][0] != old_keyboard_matrix_last_time[4][0])
+    if (keyboard_matrix[4][0])
     {
       need_increase_fan_speed = true;
       old_keyboard_matrix_last_time[4][0] = keyboard_matrix[4][0];
@@ -559,25 +559,25 @@ bool IIC_KEYBOARD::new_keyboard_routine(int mouse_x, int mouse_y)
   // --- 特殊指令修复：必须更新 old_matrix，否则一直触发 ---
   if (iic_buffer[1] == 66)
   {
-    if (keyboard_matrix[5][11] != new_keyboard_matrix_last_time[5][11])
+    if (keyboard_matrix[5][11])
     {
       new_keyboard_matrix_last_time[5][11] = keyboard_matrix[5][11];
       need_increase_backlight = true;
     }
 
-    if (keyboard_matrix[4][11] != new_keyboard_matrix_last_time[4][11])
+    if (keyboard_matrix[4][11] )
     {
       new_keyboard_matrix_last_time[4][11] = keyboard_matrix[4][11];
       need_reduce_backlight = true;
     }
 
-    if (keyboard_matrix[3][11] != new_keyboard_matrix_last_time[3][11])
+    if (keyboard_matrix[3][11])
     {
       new_keyboard_matrix_last_time[3][11] = keyboard_matrix[3][11];
       need_increase_fan_speed = true;
     }
 
-    if (keyboard_matrix[2][11] != new_keyboard_matrix_last_time[2][11])
+    if (keyboard_matrix[2][11] )
     {
       new_keyboard_matrix_last_time[2][11] = keyboard_matrix[2][11];
       need_reduce_fan_speed = true;

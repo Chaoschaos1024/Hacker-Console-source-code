@@ -168,7 +168,7 @@ bool IO_CONFIG::fan_update(uint8_t fan_duty_cycle) {
 #endif
   return true;
 }
-bool IO_CONFIG::backlight_setup(float backlight_duty_cycle) {
+bool IO_CONFIG::backlight_setup(uint8_t backlight_duty_cycle) {
   if (backlight_duty_cycle > backlight_max)
   {
     backlight_duty_cycle = backlight_max;
@@ -185,7 +185,7 @@ bool IO_CONFIG::backlight_setup(float backlight_duty_cycle) {
 #endif
   return true;
 }
-bool IO_CONFIG::backlight_update(float backlight_duty_cycle) {
+bool IO_CONFIG::backlight_update(uint8_t backlight_duty_cycle) {
   if (backlight_duty_cycle > backlight_max)
   {
     backlight_duty_cycle = backlight_max;

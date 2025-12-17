@@ -22,7 +22,7 @@ public:
     uint8_t read_fan_value();
     float read_backlight_value();
     bool write_fan_value(uint8_t value);
-    bool write_backlight_value(float value);
+    bool write_backlight_value(uint8_t value);
     uint8_t read_led_function(uint8_t num);
     bool write_led_function(uint8_t num, uint8_t func);
 
@@ -34,9 +34,9 @@ private:
     const uint8_t fan_pwm_value_address = 1;
     const uint8_t backlight_pwm_value_address = 3;
     const uint8_t fan_pwm_value_default = 50;
-    const float backlight_pwm_value_default = 80;
-    const uint8_t setup_flag = COMPILE_FLAG;
-    const uint16_t setup_flag_address = 4095;
+    const float backlight_pwm_value_default = 95;
+    const uint8_t setup_flag = version*10;
+    const uint16_t setup_flag_address = 666;
 
     /*
     0 未设置

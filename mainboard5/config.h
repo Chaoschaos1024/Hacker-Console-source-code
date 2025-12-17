@@ -10,7 +10,7 @@
 #ifndef CONFIG_H 
 #define CONFIG_H
 
-#define version 5.6
+#define version 5.8
 #define debug 0
 #define debug_delay 100
 #define debug_delay_short 100

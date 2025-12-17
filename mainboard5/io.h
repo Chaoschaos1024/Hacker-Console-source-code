@@ -90,8 +90,8 @@ public:
   bool fan_update(uint8_t fan_duty_cycle);
   //bool fan_speed_increase();
   //bool fan_speed_reduce();
-  bool backlight_setup(float backlight_duty_cycle);
-  bool backlight_update(float backlight_duty_cycle);
+  bool backlight_setup(uint8_t backlight_duty_cycle);
+  bool backlight_update(uint8_t backlight_duty_cycle);
   //bool backlight_increase();
   //bool backlight_reduce();
   uint8_t  fan_report();
@@ -120,10 +120,10 @@ public:
   uint8_t fan_speed_step = 2;
   const uint8_t fan_speed_max = 100;
   const uint8_t fan_speed_min = 0;
-  float backlight_value = 0;
-  float backlight_step = 0.2;
-  const float backlight_max=100;
-  const float backlight_min=80;
+  uint8_t backlight_value = 80;
+  uint8_t backlight_step = 1;
+  const uint8_t backlight_max=100;
+  const uint8_t backlight_min=80;
 
   bool screen_enabled = false;
 

@@ -29,7 +29,6 @@ bool EEPROM_CONFIG::begin()
 #endif
     EEPROM.write(fan_pwm_value_address, fan_pwm_value_default);
     EEPROM.write(backlight_pwm_value_address, backlight_pwm_value_default);
-    EEPROM.write(backlight_pwm_value_address + 1, 0);
     EEPROM.write(ws2812_func_address[0], ws2812_func[0]);
     EEPROM.write(ws2812_func_address[1], ws2812_func[1]);
     EEPROM.write(ws2812_func_address[2], ws2812_func[2]);
@@ -56,7 +55,7 @@ uint8_t EEPROM_CONFIG::read_fan_value()
 
 float EEPROM_CONFIG::read_backlight_value()
 {
-  backlight_pwm_value = EEPROM.read(backlight_pwm_value_address) + float(EEPROM.read(backlight_pwm_value_address)) / 10;
+  backlight_pwm_value = EEPROM.read(backlight_pwm_value_address) ;
   EEPROM.commit();
 #if debug
   Serial1.print("read backlight value from eeprom.backlight value:");
@@ -78,13 +77,12 @@ bool EEPROM_CONFIG::write_fan_value(uint8_t value)
 #endif
   return true;
 }
-bool EEPROM_CONFIG::write_backlight_value(float value)
+bool EEPROM_CONFIG::write_backlight_value(uint8_t value)
 {
 #if debug
   Serial1.println("writing backlight value to eeprom");
 #endif
-  EEPROM.write(backlight_pwm_value_address, (int)value);
-  EEPROM.write(backlight_pwm_value_address, (int)(value * 10) % 10);
+  EEPROM.write(backlight_pwm_value_address, value);
   backlight_pwm_value = value;
   EEPROM.commit();
 #if debug
