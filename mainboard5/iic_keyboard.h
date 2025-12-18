@@ -142,6 +142,7 @@ private:
     const uint8_t mouse_dead_zone = 30;
 
     bool mouse_left_flag = false;
+    bool need_to_release_touch=false;
 
     uint8_t iic_buffer[keyboard_iic_length];
 

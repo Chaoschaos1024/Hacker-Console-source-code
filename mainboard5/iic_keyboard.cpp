@@ -323,9 +323,15 @@ bool IIC_KEYBOARD::old_keyboard_routine(int mouse_x, int mouse_y)
       mouse_y = MOUSE_MAX;
 
     if (mouse_left_flag)
+    {
       MyMouseAbsolute.press(mouse_x, mouse_y, MOUSE_LEFT);
+      need_to_release_touch = true;
+    }
     else
+    {
       MyMouseAbsolute.move(mouse_x, mouse_y, 0);
+      need_to_release_touch = true;
+    }
 
     mouse_moved = true;
 #if debug
@@ -335,6 +341,14 @@ bool IIC_KEYBOARD::old_keyboard_routine(int mouse_x, int mouse_y)
     Serial1.print(mouse_y);
     Serial1.println();
 #endif
+  }
+  else
+  {
+    if ( need_to_release_touch == true)
+    {
+      MyMouseAbsolute.release(mouse_x, mouse_y, 0);
+      need_to_release_touch = false;
+    }
   }
 
   // helper lambda: safe check for keycode indices that index key_massage_to_show etc.
@@ -541,6 +555,7 @@ bool IIC_KEYBOARD::new_keyboard_routine(int mouse_x, int mouse_y)
 #if debug
   Serial1.println("new keyboard routine running");
 #endif
+
   bool keyboard_matrix[7][12] = {0};
 
   // --- 解析按键矩阵 ---
@@ -609,6 +624,13 @@ bool IIC_KEYBOARD::new_keyboard_routine(int mouse_x, int mouse_y)
     mouse_direction[13] = (d == 0b00000011);
     mouse_direction[14] = (d == 0b00000001);
     mouse_direction[15] = (d == 0b10000001);
+  } else
+  {
+    if ( need_to_release_touch == true)
+    {
+      MyMouseAbsolute.release(mouse_x, mouse_y, 0);
+      need_to_release_touch = false;
+    }
   }
 
   // --- 摇杆移动 ---
@@ -633,10 +655,13 @@ bool IIC_KEYBOARD::new_keyboard_routine(int mouse_x, int mouse_y)
         mouse_y = 32767;
 
       if (mouse_left_flag)
-        MyMouseAbsolute.press(mouse_x, mouse_y, MOUSE_LEFT);
+      { MyMouseAbsolute.press(mouse_x, mouse_y, MOUSE_LEFT);
+        need_to_release_touch = true;
+      }
       else
-        MyMouseAbsolute.move(mouse_x, mouse_y, 0);
-
+      { MyMouseAbsolute.move(mouse_x, mouse_y, 0);
+        need_to_release_touch = true;
+      }
       mouse_moved = true;
       break;
     }
