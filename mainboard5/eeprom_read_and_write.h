@@ -25,6 +25,19 @@ class EEPROM_CONFIG
     bool write_backlight_value(uint8_t value);
     uint8_t read_led_function(uint8_t num);
     bool write_led_function(uint8_t num, uint8_t func);
+    uint16_t charging_battery_max=0;
+    uint16_t read_charging_battery_max();
+    bool write_charging_battery_max(uint16_t battery);
+    uint16_t battery_max=0;
+    uint16_t read_battery_max();
+    bool write_battery_max(uint16_t battery);
+    uint16_t battery_min=0;
+    uint16_t read_battery_min();
+    bool write_battery_min(uint16_t battery);
+    float device_version=0;
+#if debug
+    bool eeprom_report();
+#endif
 
     uint8_t fan_pwm_value = 0;
     uint8_t backlight_pwm_value = 0;
@@ -35,8 +48,22 @@ class EEPROM_CONFIG
     const uint8_t backlight_pwm_value_address = 3;
     const uint8_t fan_pwm_value_default = 50;
     const float backlight_pwm_value_default = 95;
-    const uint8_t setup_flag = static_cast<uint8_t>(static_cast<int>(version * 100) % 255);
+    const uint8_t setup_flag = version_major;
+    const uint8_t setup_flag_ = version_minor;
+
     const uint16_t setup_flag_address = 666;
+
+    bool write_uint16_t(uint16_t num, unsigned int addr);
+    uint16_t read_uint16_t(unsigned int addr);
+    const unsigned int charging_battery_max_address = setup_flag_address + 10;
+    const unsigned int battery_max_address = setup_flag_address + 20;
+    const unsigned int battery_min_address = setup_flag_address + 30;
+
+    const uint16_t battery_min_default=40000;
+    const uint16_t battery_max_default=40000;
+
+    bool empty_eeprom();
+
 
     /*
       0 未设置

@@ -16,6 +16,8 @@
 #include "config.h"
 //#include "logo.h"
 #include <Fonts/Picopixel.h>
+#include <Fonts/Org_01.h>
+#include <Fonts/Tiny3x3a2pt7b.h>
 
 #define iic_display_enable 1
 #define iic_display_width 128
@@ -23,6 +25,7 @@
 #define iic_display_reset -1
 #define iic_display_address 0x3c
 #define front1 Picopixel
+#define front2 Org_01
 extern Adafruit_SSD1306 display;
 #define tip_massage_max 200
 
@@ -638,8 +641,8 @@ class IIC_DISPLAY {
 
     unsigned int tip_massage = 0;
     unsigned int logo_section = 0;
-    int real_x = 0;
-    int real_y = 0;
+    int real_x = 500;
+    int real_y = 500;
     const char key_massage_to_show[256][9] = {
       { " " },         // 0x00
       { "MOU_L" },     // 0x01
@@ -834,7 +837,7 @@ class IIC_DISPLAY {
       { "" },          // 0xBE
       { "" },          // 0xBF
       { "" },          // 0xC0
-      { "CAPSLOCK" },  // 0xC1
+      { "CAPS" },  // 0xC1
       { "F1" },        // 0xC2
       { "F2" },        // 0xC3
       { "F3" },        // 0xC4
@@ -901,9 +904,10 @@ class IIC_DISPLAY {
 
   public:
     bool ssd1306_screen_exist = false;
-    bool begin();
+    bool begin(float device_version);
     bool screen_exist_test();
-    bool update(unsigned int x, unsigned int y, bool charge_or_not, bool charge_done_or_not, unsigned int battery_percent, unsigned int battery_voltage, bool screen_enabled, uint8_t backlight_duty_cycle, uint8_t fan_duty_cycle, unsigned int keyboard_status, unsigned int last_key);
+    bool clear();
+    bool update(unsigned int x, unsigned int y, bool charge_or_not, bool charge_done_or_not, unsigned int battery_percent, unsigned int battery_voltage, bool screen_enabled, uint8_t backlight_duty_cycle, uint8_t fan_duty_cycle, unsigned int keyboard_status, unsigned int last_key,uint16_t battery_max,uint16_t battery_min,uint16_t charge_max,uint16_t pi_valtage);
     bool flash();
 };
 

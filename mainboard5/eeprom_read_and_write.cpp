@@ -8,6 +8,7 @@
    Copyright (c) 2025 by 无序熵增, All Rights Reserved.
 */
 #include "eeprom_read_and_write.h"
+#include"config.h"
 
 bool EEPROM_CONFIG::begin()
 {
@@ -16,29 +17,38 @@ bool EEPROM_CONFIG::begin()
   Serial1.print("the eeprom flag is : ");
   Serial1.println(setup_flag);
 #endif
-  if (EEPROM.read(setup_flag_address) == setup_flag)
+  if (EEPROM.read(setup_flag_address) == setup_flag&&EEPROM.read(setup_flag_address+1) == setup_flag_ )
   {
 #if debug
     Serial1.println("not first time read eeprom");
 #endif
+    read_battery_max();
+    read_battery_min();
+    read_charging_battery_max();
   }
   else
   {
 #if debug
     Serial1.println("first time read eeprom");
 #endif
+    empty_eeprom();
     EEPROM.write(fan_pwm_value_address, fan_pwm_value_default);
     EEPROM.write(backlight_pwm_value_address, backlight_pwm_value_default);
     EEPROM.write(ws2812_func_address[0], ws2812_func[0]);
     EEPROM.write(ws2812_func_address[1], ws2812_func[1]);
     EEPROM.write(ws2812_func_address[2], ws2812_func[2]);
     EEPROM.write(ws2812_func_address[3], ws2812_func[3]);
+    write_charging_battery_max(battery_max_default);
+    write_battery_max(battery_max_default);
+    write_battery_min(battery_min_default);
     EEPROM.write(setup_flag_address, setup_flag);
+    EEPROM.write(setup_flag_address + 1, setup_flag_);
     EEPROM.commit();
 #if debug
     Serial1.println("eeprom first time setup finish");
 #endif
   }
+  device_version = (float)EEPROM.read(setup_flag_address) + (float)EEPROM.read(setup_flag_address + 1) / 100;
   return true;
 }
 
@@ -90,6 +100,79 @@ bool EEPROM_CONFIG::write_backlight_value(uint8_t value)
   Serial1.println(value);
 #endif
   return true;
+}
+// 正确读取 uint16_t 数据（2字节）
+uint16_t EEPROM_CONFIG::read_uint16_t(unsigned int addr) {
+  uint16_t value = 0;
+
+  // 读取低字节（小端序）或高字节（大端序），根据你的硬件决定
+  // 常见的是小端序（低位在前）
+
+  // 方法1：直接读取（小端序）
+  byte lowByte = EEPROM.read(addr);
+  byte highByte = EEPROM.read(addr + 1);
+  value = (highByte << 8) | lowByte;
+
+  // 方法2：使用指针（更清晰）
+  // byte* p = (byte*)&value;
+  // p[0] = EEPROM.read(addr);     // 低字节
+  // p[1] = EEPROM.read(addr + 1); // 高字节
+
+  return value;
+}
+
+// 正确写入 uint16_t 数据（2字节）
+bool EEPROM_CONFIG::write_uint16_t(uint16_t num, unsigned int addr) {
+  // 分解为2个字节（小端序）
+  byte lowByte = num & 0xFF;        // 低8位
+  byte highByte = (num >> 8) & 0xFF; // 高8位
+
+  EEPROM.write(addr, lowByte);
+  EEPROM.write(addr + 1, highByte);
+
+  // 根据Arduino平台处理commit
+#if defined(ESP8266) || defined(ESP32)
+  // ESP系列需要commit
+  EEPROM.commit();
+#endif
+
+  return true;
+}
+// 读取充电最大电池值
+uint16_t EEPROM_CONFIG::read_charging_battery_max() {
+  charging_battery_max = read_uint16_t(charging_battery_max_address);
+  return charging_battery_max;
+}
+
+// 写入充电最大电池值
+bool EEPROM_CONFIG::write_charging_battery_max(uint16_t battery) {
+  charging_battery_max = battery;
+  return write_uint16_t(battery, charging_battery_max_address);
+}
+
+// 读取最大电池值
+uint16_t EEPROM_CONFIG::read_battery_max() {
+  battery_max = read_uint16_t(battery_max_address);
+  return battery_max;
+}
+
+// 写入最大电池值
+bool EEPROM_CONFIG::write_battery_max(uint16_t battery) {
+  battery_max = battery;
+  return write_uint16_t(battery, battery_max_address);
+}
+
+// 读取最小电池值
+uint16_t EEPROM_CONFIG::read_battery_min() {
+
+  battery_min = read_uint16_t(battery_min_address);
+  return battery_min;
+}
+
+// 写入最小电池值
+bool EEPROM_CONFIG::write_battery_min(uint16_t battery) {
+  battery_min = battery;
+  return write_uint16_t(battery, battery_min_address);
 }
 uint8_t EEPROM_CONFIG::read_led_function(uint8_t num)
 {
@@ -170,3 +253,42 @@ bool EEPROM_CONFIG::write_led_function(uint8_t num, uint8_t func)
   }
   return false;
 }
+bool EEPROM_CONFIG::empty_eeprom()
+{
+#if debug
+  Serial1.println("start to empty eeprom");
+#endif
+  for (int i = 0; i < eeprom_space; i++)
+  {
+    EEPROM.write(i, 0);
+  }
+  EEPROM.commit();
+#if debug
+  Serial1.println("eeprom now is empty");
+#endif
+  return true;
+}
+
+#if debug
+bool EEPROM_CONFIG::eeprom_report()
+{
+  Serial1.print("version : ");
+  Serial1.println( EEPROM.read(setup_flag_address) * 100 + EEPROM.read(setup_flag_address + 1));
+  uint16_t valtage = read_charging_battery_max();
+  Serial1.print("charging_battery_max : ");
+  delay(1);
+  Serial1.println(valtage);
+  delay(1);
+  Serial1.print("read_battery_max : ");
+  delay(1);
+  valtage = read_battery_max();
+  Serial1.println(valtage);
+  delay(1);
+  Serial1.print("read_battery_min : ");
+  delay(1);
+  valtage =  read_battery_max();
+  Serial1.println(valtage);
+  delay(1);
+  return true;
+}
+#endif

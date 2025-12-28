@@ -1,12 +1,12 @@
 /*
- * @Author: 无序熵增
- * @Date: 2025-07-25 11:43:28
- * @LastEditors: 无序熵增
- * @LastEditTime: 2025-10-10 22:39:16
- * @Description:
- *
- * Copyright (c) 2025 by 无序熵增, All Rights Reserved.
- */
+   @Author: 无序熵增
+   @Date: 2025-07-25 11:43:28
+   @LastEditors: 无序熵增
+   @LastEditTime: 2025-12-25 19:21:28
+   @Description:
+
+   Copyright (c) 2025 by 无序熵增, All Rights Reserved.
+*/
 #ifndef IO_H
 #define IO_H
 
@@ -74,71 +74,108 @@
 #define main_power A2
 #define pi_3v3 A3
 
+// ===== calibration thresholds =====
+static constexpr uint16_t BATTERY_CALIB_DELTA_MV = 30;   // 30mV
+static constexpr uint16_t BATTERY_CALIB_STABLE_CNT = 50; // 连续50次
+static constexpr uint32_t BATTERY_CALIB_WRITE_INTERVAL = 3000; // loop ticks
+struct BatteryLUT
+{
+  uint16_t v_01mv;   // 电压，单位 0.1mV
+  uint8_t  percent; // SOC
+};
+
 extern uint32_t pwm_pins[];
 extern RP2040_PWM *pwm_instance[2];
 
 class IO_CONFIG
 {
-public:
-  bool begin();
-  uint8_t battery_percent_read();
-  uint16_t battery_voltage_read();
-  uint16_t pi_main_power_read();
-  uint16_t backlight_voltage_read();
-  uint16_t pi_3v3_voltage_read();
-  bool fan_setup(uint8_t fan_duty_cycle);
-  bool fan_update(uint8_t fan_duty_cycle);
-  //bool fan_speed_increase();
-  //bool fan_speed_reduce();
-  bool backlight_setup(uint8_t backlight_duty_cycle);
-  bool backlight_update(uint8_t backlight_duty_cycle);
-  //bool backlight_increase();
-  //bool backlight_reduce();
-  uint8_t  fan_report();
-  uint8_t backlight_report();
-  bool read_hdmi_status();
-  bool update_charge_status();
-  bool battery_voltage_update();
-  void led1_flip();
-  void led2_flip();
-  void led1_high();
-  void led1_low();
-  void led2_high();
-  void led2_low();
+  public:
+    bool begin();
+    uint8_t battery_percent_read();
+    uint16_t battery_voltage_read();
+    uint16_t pi_main_power_read();
+    uint16_t backlight_voltage_read();
+    uint16_t pi_3v3_voltage_read();
+    bool fan_setup(uint8_t fan_duty_cycle);
+    bool fan_update(uint8_t fan_duty_cycle);
+    // bool fan_speed_increase();
+    // bool fan_speed_reduce();
+    bool backlight_setup(uint8_t backlight_duty_cycle);
+    bool backlight_update(uint8_t backlight_duty_cycle);
+    // bool backlight_increase();
+    // bool backlight_reduce();
+    uint8_t fan_report();
+    uint8_t backlight_report();
+    bool read_hdmi_status();
+    bool update_charge_status();
+    bool battery_voltage_update();
+    uint8_t battery_voltage_to_percent(uint16_t v_01mv);
+    uint16_t set_battery_0_percent_value(uint16_t value);
+    uint16_t set_battery_100_percent_value(uint16_t value);
+    void led1_flip();
+    void led2_flip();
+    void led1_high();
+    void led1_low();
+    void led2_high();
+    void led2_low();
 
-  const uint16_t battery_0_percent = 33000;
-  const uint16_t battery_100_percent = 43000;
-  uint8_t battery_percent = 0;
-  uint16_t battery_voltage = 0;
-  uint16_t pi_main_power_voltage = 0;
-  uint16_t backlight_voltage = 0;
-  uint16_t pi_3v3_voltage = 0;
+    uint16_t charging_battery_max = 0;
+    uint16_t battery_0_percent = 40000;
+    uint16_t battery_100_percent = 40000;
+    uint8_t battery_percent = 0;
+    uint16_t battery_voltage = 0;
+    const uint8_t battery_count_max = 50;
+    uint16_t pi_main_power_voltage = 0;
+    uint16_t pi_main_power_voltage_min = 49300;
+    uint8_t pi_main_power_voltage_count_max = 50;
+    uint8_t  pi_main_power_voltage_long_count_max = 3;
+    uint16_t backlight_voltage = 0;
+    uint16_t pi_3v3_voltage = 0;
+    uint8_t pi_3v3_voltage_count_max = 50;
 
-  const uint16_t backlight_pwm_freq = 10000;
-  const uint16_t fan_pwm_freq = 10000;
-  uint8_t fan_speed_value = 0;
-  uint8_t fan_speed_step = 2;
-  const uint8_t fan_speed_max = 100;
-  const uint8_t fan_speed_min = 0;
-  uint8_t backlight_value = 80;
-  uint8_t backlight_step = 1;
-  const uint8_t backlight_max=100;
-  const uint8_t backlight_min=80;
+    const uint16_t backlight_pwm_freq = 10000;
+    const uint16_t fan_pwm_freq = 10000;
+    uint8_t fan_speed_value = 0;
+    uint8_t fan_speed_step = 2;
+    const uint8_t fan_speed_max = 100;
+    const uint8_t fan_speed_min = 0;
+    uint8_t backlight_value = 80;
+    uint8_t backlight_step = 1;
+    const uint8_t backlight_max = 100;
+    const uint8_t backlight_min = 80;
+    uint8_t backlight_voltage_count_max = 50;
 
-  bool screen_enabled = false;
+    bool screen_enabled = false;
 
-  bool charge_or_not = false;
-  bool charge_done_or_not = false;
+    bool charge_or_not = false;
+    bool charge_done_or_not = false;
 
-private:
-  bool serial_setup();
-  bool iic_setup();
-  bool pin_setup();
-  bool adc_setup();
-  uint8_t battery_count=0;
-  uint8_t battery_count_max=50;
-  unsigned long battery_long=0;
-  const int delay_=500;
+    // ===== battery self calibration =====
+
+    // stable counters
+    uint16_t battery_max_stable_cnt = 0;
+    uint16_t battery_min_stable_cnt = 0;
+    uint16_t charging_max_stable_cnt = 0;
+
+    // write interval protection (loop ticks)
+    uint32_t last_battery_max_write_tick = 0;
+    uint32_t last_battery_min_write_tick = 0;
+    uint32_t last_charging_max_write_tick = 0;
+
+  private:
+    bool serial_setup();
+    bool iic_setup();
+    bool pin_setup();
+    bool adc_setup();
+    uint8_t battery_count = 0;
+    unsigned long battery_long = 0;
+    long pi_main_power_voltage_long = 0;
+    uint8_t pi_main_power_voltage_count = 0;
+    long pi_main_power_voltage_long_long = 0;
+    uint8_t pi_main_power_voltage_long_long_count = 0;
+    const int delay_ = 500;
+
+
 };
 
 #endif

@@ -12,7 +12,7 @@
 
 Adafruit_SSD1306 display(iic_display_width, iic_display_height, &Wire1, iic_display_reset);
 
-bool IIC_DISPLAY::begin()
+bool IIC_DISPLAY::begin(float device_version)
 {
   screen_exist_test();
   if (ssd1306_screen_exist)
@@ -30,7 +30,7 @@ bool IIC_DISPLAY::begin()
     display.print("COMSOLE");
     display.setCursor(35, 10);
     display.print("Ver:");
-    display.print(version);
+    display.print(device_version);
 #if debug
     display.print("(debug)");
 #endif
@@ -53,7 +53,7 @@ bool IIC_DISPLAY::begin()
 bool IIC_DISPLAY::screen_exist_test()
 {
   Wire1.beginTransmission(iic_display_address);
-  int error =Wire1.endTransmission();
+  int error = Wire1.endTransmission();
 
   if (error == 0)
   {
@@ -81,15 +81,24 @@ bool IIC_DISPLAY::screen_exist_test()
   }
   return false;
 }
-bool IIC_DISPLAY::update(unsigned int x, unsigned int y, bool charge_or_not, bool charge_done_or_not, unsigned int battery_percent, unsigned int battery_voltage, bool screen_enabled, uint8_t backlight_duty_cycle, uint8_t fan_duty_cycle, unsigned int keyboard_status, unsigned int last_key)
+bool IIC_DISPLAY::clear()
 {
   if (ssd1306_screen_exist)
   {
     display.clearDisplay();
+    return true;
+  }
+  return false;
+}
+bool IIC_DISPLAY::update(unsigned int x, unsigned int y, bool charge_or_not, bool charge_done_or_not, unsigned int battery_percent, unsigned int battery_voltage, bool screen_enabled, uint8_t backlight_duty_cycle, uint8_t fan_duty_cycle, unsigned int keyboard_status, unsigned int last_key, uint16_t battery_max, uint16_t battery_min, uint16_t charge_max, uint16_t pi_valtage)
+{
+  if (ssd1306_screen_exist)
+  {
+    display.setFont(&front2);
     if (x | y)
     {
-      real_x = x;
-      real_y = y;
+      real_x = x / 33;
+      real_y = y / 33;
       x = map(x, 0, 32767, 0, logo_width);
       y = map(y, 0, 32767, 0, logo_hight);
       display.drawCircle(x, y, 1, SSD1306_WHITE);
@@ -119,11 +128,11 @@ bool IIC_DISPLAY::update(unsigned int x, unsigned int y, bool charge_or_not, boo
       display.cp437(true);
       if (charge_done_or_not)
       {
-        display.print("Charge OK");
+        display.print("BAT OK");
       }
       else
       {
-        display.print("Charging");
+        display.print("CHARGE");
       }
     }
     else
@@ -141,60 +150,68 @@ bool IIC_DISPLAY::update(unsigned int x, unsigned int y, bool charge_or_not, boo
       {
         display.setTextSize(1);
         display.setTextColor(SSD1306_WHITE);
-        display.setCursor(0, 37);
+        display.setCursor(5
+                          , 37);
         display.cp437(true);
-        display.print("Full");
+        display.print("FULL");
       }
       else if (battery_percent >= 75)
       {
         display.setTextSize(1);
         display.setTextColor(SSD1306_WHITE);
-        display.setCursor(0, 37);
+        display.setCursor(3, 37);
         display.cp437(true);
+        display.print(">");
         display.print(battery_percent);
         display.print("%");
+        display.print("<");
       }
       else if (battery_percent >= 50)
       {
         display.setTextSize(1);
         display.setTextColor(SSD1306_WHITE);
-        display.setCursor(0, 37);
+        display.setCursor(3, 37);
         display.cp437(true);
+        display.print(">");
         display.print(battery_percent);
         display.print("%");
+        display.print("<");
       }
       else if (battery_percent >= 25)
       {
         display.setTextSize(1);
         display.setTextColor(SSD1306_WHITE);
-        display.setCursor(0, 37);
+        display.setCursor(3, 37);
         display.cp437(true);
+        display.print(">");
         display.print(battery_percent);
         display.print("%");
+        display.print("<");
       }
       else if (battery_percent >= 10)
       {
         display.setTextSize(1);
         display.setTextColor(SSD1306_WHITE);
-        display.setCursor(0, 37);
+        display.setCursor(3, 37);
         display.cp437(true);
+        display.print(">");
         display.print(battery_percent);
         display.print("%");
+        display.print("<");
       }
       else
       {
         display.setTextSize(1);
         display.setTextColor(SSD1306_WHITE);
-        display.setCursor(0, 37);
+        display.setCursor(6, 37);
         display.cp437(true);
+        display.print("-!");
         display.print(battery_percent);
         display.print("%");
+        display.print("!-");
       }
     }
-#if debug
-    display.print("/");
-    display.print(battery_voltage / 10);
-#endif
+    display.setFont(&front1);
     display.drawLine(0, 40, 31, 40, SSD1306_WHITE);
     display.setCursor(0, 46);
     display.setTextSize(1);
@@ -212,7 +229,7 @@ bool IIC_DISPLAY::update(unsigned int x, unsigned int y, bool charge_or_not, boo
 #if debug
     display.print("L:");
 #else
-    display.print("Light:");
+    display.print("LIGHT:");
 #endif
     uint8_t i = backlight_duty_cycle;
 #if debug
@@ -223,31 +240,48 @@ bool IIC_DISPLAY::update(unsigned int x, unsigned int y, bool charge_or_not, boo
     display.print(i);
     display.setCursor(0, 62);
     display.setTextSize(1);
-    display.print("Fan:");
+    display.print("FAN:");
     i = fan_duty_cycle;
     display.print(i);
     display.drawLine(0, 65, 31, 65, SSD1306_WHITE);
+    display.setFont(&front2);
     display.setCursor(0, 71);
     display.setTextSize(1);
     display.print("X:");
     display.println(real_x);
     display.print("Y:");
     display.println(real_y);
-
     if (keyboard_status)
     {
       display.print("K:");
+      display.setFont(&front1);
       display.println(key_massage_to_show[last_key]);
+    }
+    else
+    {
+      display.print("NO KB!");
     }
     int display_y = 86;
     display.drawLine(0, display_y, 31, display_y, SSD1306_WHITE);
+    display.setFont(&front1);
     display.setCursor(0, display_y + 6);
     display.setTextSize(1);
 #if debug
-    display.println("kbs=");
+    display.print("kbs=");
     display.println(keyboard_status);
+    //,uint16_t battery_max,uint16_t battery_min,uint16_t charge_max
+    display.print("B=");
+    display.println(battery_max);
+    display.print("b=");
+    display.println(battery_min);
+    display.print("C=");
+    display.println(charge_max);
+    display.print("P=");
+    display.println(pi_valtage);
 #else
+    display.setFont(&front2);
     display.println("TIPS:");
+    display.setFont(&front1);
     if (keyboard_status == 1)
     {
       display.println("STICK");
@@ -256,31 +290,35 @@ bool IIC_DISPLAY::update(unsigned int x, unsigned int y, bool charge_or_not, boo
     else if (keyboard_status > 1)
     {
       display.println("MOU L+R");
-      display.print("+ ");
+      display.print("  + ");
     }
     if (tip_massage < tip_massage_max / 4)
     {
-      display.println("F1");
+      display.print("F1");
       display.println("=");
-      display.println("light up");
+      display.println("  LIGHT"); 
+      display.println("    UP");
     }
     else if (tip_massage < tip_massage_max / 2)
     {
-      display.println("F2");
+      display.print("F2");
       display.println("=");
-      display.println("light down");
+      display.println("  LIGHT"); 
+      display.println("  DOWN");
     }
     else if (tip_massage < tip_massage_max / 4 * 3)
     {
-      display.println("F3");
+      display.print("F3");
       display.println("=");
-      display.println("fan up");
+      display.println("   FAN");
+      display.println("   UP");
     }
     else if (tip_massage < tip_massage_max)
     {
-      display.println("F4");
+      display.print("F4");
       display.println("=");
-      display.println("fan down");
+      display.println("   FAN");
+      display.println("  DOWN");
     }
     tip_massage++;
 

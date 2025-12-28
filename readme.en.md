@@ -3,7 +3,7 @@
  * @Author: Entropy Disorder
  * @Date: 2025-12-11 22:22:40
  * @LastEditors: 无序熵增
- * @LastEditTime: 2025-12-18 18:49:16
+ * @LastEditTime: 2025-12-28 18:14:59
  * @Description:
  *
  * Copyright (c) 2025 by Entropy Disorder, All Rights Reserved.
@@ -29,7 +29,11 @@ As a highly expandable handheld terminal, it features:
 - 🏗️ **Open-source enclosure design**, supports customization
 
 ## 🔧 Firmware Description
-This repository provides the programs running on the main control board, including firmware for two microcontrollers.
+This repository provides the programs running on the main control board and the keyboard, including programs for two microcontrollers.
+The latest version is 5.92, with the following updates:
+1. Using IIR filtering to estimate battery level
+2. Optimized keyboard user experience
+3. The layout of the secondary screen has been modified
 
 ### ⌨️ Keyboard Module Firmware
 There are both new and old keyboard versions. Please select the corresponding firmware according to the keyboard version you have.  
@@ -124,7 +128,7 @@ The mainboard firmware is located in the `mainboard5` folder.
 **You are welcome to:**
 - ✏️ Modify the code and submit Pull Requests
 - 💡 Share new ideas and improvement suggestions
-- 👥 Join the discussion group: **867028792** to get in touch
+- 👥 Join the QQ discussion group: **867028792** to get in touch
 
 Thank you for your interest and support!
 
